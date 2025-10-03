@@ -27,7 +27,7 @@ class PaymentViewSet(CreateRetrieveListMixin):
 
     def perform_create(self, serializer):
         PaymentsService.checking_time_collection(
-            serializer.validated_data['collection']
+            serializer.validated_data['collect']
         )
         serializer.save(user=self.request.user)
         send_notification_payment.delay(

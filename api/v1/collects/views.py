@@ -1,4 +1,4 @@
-
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from api.v1.collects.serializers import (CollectsSerializers,
@@ -18,6 +18,7 @@ class CollectViewSet(CreateRetrieveListUpdateMixin):
     queryset = Collect.objects.all().order_by('id')
     pagination_class = CollectPageNumberPagination
     http_method_names = ['get', 'patch', 'post']
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_permissions(self):
         match self.action:

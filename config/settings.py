@@ -127,13 +127,13 @@ AUTH_USER_MODEL = 'users.User'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CELERY_BROKER_URL = getenv('CELERY_BROKER', 'redis://redis:6379/0')
 CELERY_RESULT_BACKEND = getenv('CELERY_BROKER', 'redis://redis:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
 if getenv('LOCAL', 'False') == 'True':
     CACHES = {
@@ -154,7 +154,7 @@ if getenv('LOCAL', 'False') == 'True':
             },
         },
     }
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
     EMAIL_FILE_PATH = 'emails'
 else:
     CACHES = {
