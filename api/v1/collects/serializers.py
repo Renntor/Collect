@@ -8,7 +8,7 @@ from payments.models import Payment
 
 
 class CollectsSerializers(serializers.ModelSerializer):
-    all_donors = PaymentSerializers(many=True, read_only=True)
+    donor = PaymentSerializers(many=True, read_only=True)
     total_number_donors = serializers.SerializerMethodField()
     amount_donate = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
@@ -19,7 +19,7 @@ class CollectsSerializers(serializers.ModelSerializer):
             'id', 'user', 'name', 'reason', 'description',
             'total_goal_amount', 'image', 'date_end',
             'target_amount', 'amount_donate',
-            'total_number_donors', 'all_donors'
+            'total_number_donors', 'donor'
         )
 
     def validate(self, value):
