@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 @pytest.fixture(autouse=True, scope="session")
 def set_email_backend():
-    settings.EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmen.EmailBackend'
 
 
 @pytest.fixture(autouse=True)

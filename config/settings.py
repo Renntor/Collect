@@ -124,6 +124,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
+STATIC_ROOT = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
@@ -172,7 +173,7 @@ else:
             },
         },
     }
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
     EMAIL_USE_TLS = getenv('EMAIL_USE_TLS') == 'True'
     EMAIL_USE_SSL = getenv('EMAIL_USE_SSL') == 'True'
     EMAIL_HOST = getenv('EMAIL_HOST')
