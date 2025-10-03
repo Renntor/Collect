@@ -1,0 +1,10 @@
+class UserConstants:
+    class Lengths:
+        MAX_LENGTH_FIRST_NAME = 30
+        MIN_LENGTH_FIRST_NAME = 1
+        MAX_LENGTH_LAST_NAME = 30
+        MIN_LENGTH_LAST_NAME = 1
+        MAX_LENGTH_PATRONYMIC = 30
+        MIN_LENGTH_PATRONYMIC = 1
+        MAX_LENGTH_PASSWORD = 20
+        MIN_LENGTH_PASSWORD = 4

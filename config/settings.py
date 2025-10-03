@@ -1,8 +1,8 @@
+from datetime import timedelta
+from os import getenv
 from pathlib import Path
 
-from django.conf.global_settings import MEDIA_URL, MEDIA_ROOT
 from dotenv import load_dotenv
-from os import getenv
 
 load_dotenv()
 
@@ -14,6 +14,8 @@ DEBUG = getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', 'localhost').split()
 
+LOCAL = getenv('LOCAL')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,10 +26,11 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_spectacular',
+    'djoser',
 
     'api',
     'users',
-    'payment',
+    'payments',
     'collects',
 ]
 
@@ -71,7 +74,6 @@ DATABASES = {
     }
 }
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -87,10 +89,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(weeks=int(getenv('ACCESS_TOKEN_LIFETIME_MINUTES', 10))),
+    'REFRESH_TOKEN_LIFETIME': timedelta(weeks=int(getenv('REFRESH_TOKEN_LIFETIME_DAYS', 10))),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
-LANGUAGE_CODE = 'en-us'
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
-TIME_ZONE = 'UTC'
+SPECTACULAR_SETTINGS = {
+    'SWAGGER_UI_SETTINGS': {
+        'filter': True
+    },
+    'TITLE': 'Документация для сервиса Пожертвований',
+    'SORT_OPERATIONS': True,
+}
+
+LANGUAGE_CODE = 'ru-ru'
+
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -100,13 +122,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL= '/media/'
-MEDIA_ROOT ='media'
+AUTH_USER_MODEL = 'users.User'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'media'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = getenv('EMAIL_HOST')
-EMAIL_PORT = getenv('EMAIL_PORT')
-EMAIL_USE_TLS = getenv('EMAIL_USE_TLS') == 'True'
 EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
@@ -114,17 +135,45 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CELERY_BROKER_URL = getenv('CELERY_BROKER', 'redis://redis:6379/0')
 CELERY_RESULT_BACKEND = getenv('CELERY_BROKER', 'redis://redis:6379/0')
 
-CACHES = {
+if getenv('LOCAL', 'False') == 'True':
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379/1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
+    }
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('127.0.0.1', 6379)],
+            },
+        },
+    }
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = 'emails'
+else:
+    CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': f'redis://{getenv('REDIS_HOST', 'localhost')}:{getenv('REDIS_PORT', '6379')}/1',
         }
     }
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(f'redis://{getenv("REDIS_HOST", "127.0.0.1")}:{getenv("REDIS_PORT", "6379")}/2')],
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [(f'redis://{getenv('REDIS_HOST', '127.0.0.1')}:{getenv('REDIS_PORT', '6379')}/2')],
+            },
         },
-    },
-}
+    }
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_USE_TLS = getenv('EMAIL_USE_TLS') == 'True'
+    EMAIL_USE_SSL = getenv('EMAIL_USE_SSL') == 'True'
+    EMAIL_HOST = getenv('EMAIL_HOST')
+    EMAIL_PORT = getenv('EMAIL_PORT')
