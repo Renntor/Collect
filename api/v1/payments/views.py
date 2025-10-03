@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from api.v1.mixins import CreateRetrieveListMixin

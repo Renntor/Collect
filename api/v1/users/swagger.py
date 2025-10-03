@@ -1,7 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiExample
 
-
 NOT_AUTH_USER = OpenApiResponse(
     response=OpenApiTypes.OBJECT,
     description='Не аутентифицированный пользователь',
@@ -48,6 +47,7 @@ class UserDocs:
             ),
         }
     )
+
 
 users_viewset_docs = extend_schema_view(
     create=UserDocs.create

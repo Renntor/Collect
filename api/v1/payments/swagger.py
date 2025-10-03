@@ -39,7 +39,6 @@ class PaymentDocs:
     )
 
 
-
 payments_viewset_docs = extend_schema_view(
     list=PaymentDocs.list,
     retrieve=PaymentDocs.retrieve,
